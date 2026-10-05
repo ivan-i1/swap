@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { followDeadzone, platformerDeadzone } from '../src/game/camera';
+import { clampToBounds, followDeadzone, platformerDeadzone } from '../src/game/camera';
+
+describe('clampToBounds (FlxCamera.setBounds)', () => {
+  it('keeps the view inside the bounds, left/top first then right/bottom', () => {
+    const bounds = { x: 0, y: -32, width: 1120, height: 512 };
+    expect(clampToBounds({ x: -40, y: -100 }, bounds, 640, 480)).toEqual({ x: 0, y: -32 });
+    expect(clampToBounds({ x: 900, y: 200 }, bounds, 640, 480)).toEqual({ x: 480, y: 0 });
+  });
+
+  it('lets right/bottom win when the bounds are smaller than the view', () => {
+    expect(clampToBounds({ x: 0, y: 0 }, { x: 0, y: 0, width: 320, height: 240 }, 640, 480)).toEqual({ x: -320, y: -240 });
+  });
+});
 
 describe('platformerDeadzone (FlxCamera.STYLE_PLATFORMER)', () => {
   it('is width/8 by height/3, centred horizontally and raised by a quarter of its height', () => {

@@ -33,3 +33,18 @@ export function followDeadzone(
 
   return { x, y };
 }
+
+// FlxCamera.update: after following, keep the view inside setBounds() (left/top checked before right/bottom).
+export function clampToBounds(
+  scroll: { x: number; y: number },
+  bounds: Rect,
+  viewWidth: number,
+  viewHeight: number,
+): { x: number; y: number } {
+  let { x, y } = scroll;
+  if (x < bounds.x) x = bounds.x;
+  if (x > bounds.x + bounds.width - viewWidth) x = bounds.x + bounds.width - viewWidth;
+  if (y < bounds.y) y = bounds.y;
+  if (y > bounds.y + bounds.height - viewHeight) y = bounds.y + bounds.height - viewHeight;
+  return { x, y };
+}
