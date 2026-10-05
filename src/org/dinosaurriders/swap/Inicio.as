@@ -20,28 +20,18 @@
 		override public function create():void
         {
             var s:FlxSprite = new FlxSprite();
-			s.makeGraphic(FlxG.width, FlxG.height, 0x000000);
+			s.loadGraphic(Assets.SplashScreen);
             add(s);
 			
- 			texto=new FlxText(0, 300, FlxG.width, "Al infinito").setFormat(null, 21, 0xFF0000, "center");
+ 			texto = new FlxText(0, 30, FlxG.width, "SWAP").setFormat(null, 21, 0x9944ff, "center");
          
           	add(texto);
 		   	var botonInicio:FlxButton =  new FlxButton(FlxG.width / 2 - 40, FlxG.height / 2 - 60, "Start Game!", iniciar);
 			add(botonInicio);
-			
-			FlxG.flash(0xffffff, 1);
-			FlxG.shake(0.005, 3);
 		}
 
 		private function iniciar() : void {
-			trace("lol");
-			FlxG.switchState(new LevelLoader());
+			FlxG.switchState(new LevelContainer("Level1"));
 		}
-
-		override public function update():void
-	    {
-	        super.update();
-			texto.x++;
-	    }
 	}
 }

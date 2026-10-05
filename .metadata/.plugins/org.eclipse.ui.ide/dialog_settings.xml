@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<list key="installedFeatures">
+		<item value="com.powerflasher.fdt.ui.professional:1.13.55.1583"/>
+		<item value="com.powerflasher.fdt.ui:1.13.55.1583"/>
+		<item value="org.eclipse.cvs:1.3.200.v20120525-1249-7B79FJJAkF7BF7RGE5FAJT"/>
+		<item value="org.eclipse.datatools.common.doc.user:1.10.0.v201201161512-26-311A16321A3557"/>
+		<item value="org.eclipse.datatools.connectivity.doc.user:1.10.0.v201201161512-37D-7733L3D753L7BBF"/>
+		<item value="org.eclipse.datatools.connectivity.feature:1.10.0.v201201161512-7C7h90Et1axo7QmVkTdFIlGf6-6"/>
+		<item value="org.eclipse.datatools.connectivity.oda.designer.core.feature:1.10.0.v201201161512-7B7C7LCcNBGTBfLREXcc"/>
+		<item value="org.eclipse.datatools.connectivity.oda.designer.feature:1.10.0.v201201161512-4127w312312232267"/>
+		<item value="org.eclipse.datatools.connectivity.oda.feature:1.10.0.v201201161512-7H7C7QCcNBHKDYJgFYLT"/>
+		<item value="org.eclipse.datatools.doc.user:1.10.0.v201201161512-47C08w95FFAK89FHEC7"/>
+		<item value="org.eclipse.datatools.enablement.apache.derby.feature:1.10.0.v201201161512-77798fBmKDQ2MoTTLwdv9ILX"/>
+		<item value="org.eclipse.datatools.enablement.feature:1.10.0.v201201161512-7J9Q0BWxeMcYB5KWfz-eG7qiq-sX"/>
+		<item value="org.eclipse.datatools.enablement.hsqldb.feature:1.10.0.v201201161512-67E0AqGBM7KfNTHwKO9ILX"/>
+		<item value="org.eclipse.datatools.enablement.ibm.feature:1.10.0.v201201161512-7F47WFC7sRdqScnobkd4"/>
+		<item value="org.eclipse.datatools.enablement.ingres.feature:1.10.0.v201201161512-540AkF78Z7UCRAQDB"/>
+		<item value="org.eclipse.datatools.enablement.jdbc.feature:1.10.0.v201201161512-4-29oB5885QBB8HKW"/>
+		<item value="org.eclipse.datatools.enablement.jdt.feature:1.10.0.v201201161512-2-07w312218332612"/>
+		<item value="org.eclipse.datatools.enablement.msft.feature:1.10.0.v201201161512-544AkF7AL7MDMAQ8O"/>
+		<item value="org.eclipse.datatools.enablement.mysql.feature:1.10.0.v201201161512-5477AkF7AK7_AMENEA"/>
+		<item value="org.eclipse.datatools.enablement.oda.designer.feature:1.10.0.v201201161512-3368s7356485C59AB"/>
+		<item value="org.eclipse.datatools.enablement.oda.feature:1.10.0.v201201161512-7A7T7CDZRDKHF_HnGjOX"/>
+		<item value="org.eclipse.datatools.enablement.oracle.feature:1.10.0.v201201161512-548fAkF7AL7RBJANAI"/>
+		<item value="org.eclipse.datatools.enablement.postgresql.feature:1.10.0.v201201161512-553AkF7AK8PCRBQBP"/>
+		<item value="org.eclipse.datatools.enablement.sap.feature:1.10.0.v201201161512-540AkF7AJ7YEJBU7S"/>
+		<item value="org.eclipse.datatools.enablement.sqlite.feature:1.10.0.v201201161512-542AkF7AJ7SAKAPBF"/>
+		<item value="org.eclipse.datatools.enablement.sybase.feature:1.10.0.v201201161512-7E46F9NiNc1QBgyT6T6"/>
+		<item value="org.eclipse.datatools.intro:1.10.0.v201201161512-26-7w312116392911"/>
+		<item value="org.eclipse.datatools.modelbase.feature:1.10.0.v201201161512-7707CCcNBHIEQJXHUNf"/>
+		<item value="org.eclipse.datatools.sqldevtools.ddlgen.feature:1.10.0.v201201161512-7A-78F7RZHQSIqWjN1Zr"/>
+		<item value="org.eclipse.datatools.sqldevtools.feature:1.10.0.v201201161512-7N8B7CFDsn4hwBXz-0AGu4j6V85I"/>
+		<item value="org.eclipse.datatools.sqldevtools.parsers.feature:1.10.0.v201201161512-623BgJ9EE9ZJRDZLA"/>
+		<item value="org.eclipse.datatools.sqltools.doc.user:1.10.0.v201201161512-37D-7733L3D753L7BBF"/>
+		<item value="org.eclipse.draw2d:3.8.0.201206011524"/>
+		<item value="org.eclipse.emf.codegen.ecore.ui:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.codegen.ecore:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.codegen.ui:2.7.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.codegen:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.common.ui:2.7.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.common:2.8.0.v20120530-0726"/>
+		<item value="org.eclipse.emf.converter:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.databinding.edit:1.2.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.databinding:1.2.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.ecore.edit:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.ecore.editor:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.ecore:2.8.0.v20120530-0726"/>
+		<item value="org.eclipse.emf.edit.ui:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.edit:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.mapping.ecore.editor:2.7.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.mapping.ecore:2.7.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.mapping.ui:2.7.0.v20120601-0824"/>
+		<item value="org.eclipse.emf.mapping:2.7.0.v20120601-0824"/>
+		<item value="org.eclipse.emf:2.8.0.v20120601-0824"/>
+		<item value="org.eclipse.epp.mpc:1.1.1.I20110907-0947"/>
+		<item value="org.eclipse.epp.package.jee.feature:1.5.0.20120602-0806"/>
+		<item value="org.eclipse.gef:3.8.0.201206011524"/>
+		<item value="org.eclipse.help:1.4.0.v20120528-1714-8P7vFOTFK_Qj4JmCLJXM8Tn"/>
+		<item value="org.eclipse.jdt:3.8.0.v20120525-1249-8-8nFqlFNOfwKDRF3dXMdHyBC834"/>
+		<item value="org.eclipse.jpt.common.eclipselink.feature:1.2.0.v201203150000-33-8s7357395D3333"/>
+		<item value="org.eclipse.jpt.common.feature:1.2.0.v201203150000-66-AkF7BF7PBN7778"/>
+		<item value="org.eclipse.jpt.dbws.eclipselink.feature:1.1.100.v201203150000-797EBiCcNBHKCZEYAwHIF5L"/>
+		<item value="org.eclipse.jpt.jaxb.eclipselink.feature:1.3.0.v201203150000-777B-BgJ9EI9UDW8z0AA72A"/>
+		<item value="org.eclipse.jpt.jaxb.feature:1.2.0.v201203150000-56A7AkF7BF7NAP7777"/>
+		<item value="org.eclipse.jpt.jpa.eclipselink.feature:3.2.0.v201203150000-7M7J4F7RZHQYIwMsJyOWF5L"/>
+		<item value="org.eclipse.jpt.jpa.feature:3.2.0.v201203150000-7S7K8aFBBoPaoQM_ZRKUVF5L"/>
+		<item value="org.eclipse.jst.common.fproj.enablement.jdt:3.4.0.v201108231500-377DG8s73543J5H6D66"/>
+		<item value="org.eclipse.jst.enterprise_ui.feature:3.4.0.v201107072300-7b7JIM0FSK2WM1PS9Ar7AKUz0TrWn"/>
+		<item value="org.eclipse.jst.ws.axis2tools.feature:1.1.200.v201103022333-78-FF0DZRDKDDePSKwHj"/>
+		<item value="org.eclipse.jst.ws.cxf.feature:1.1.0.v201201312103-7H79FHxFAKlbotH5e9l3vAA6MBG"/>
+		<item value="org.eclipse.jst.ws.jaxws.feature:1.2.0.v201204151854-7E7AF70F8NcJS_KqT5TpXq"/>
+		<item value="org.eclipse.mylyn.bugzilla_feature:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.commons.identity:1.0.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.commons.notifications:1.0.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.commons.repositories:1.0.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.commons:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.context_feature:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.discovery:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.ide_feature:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.java_feature:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.monitor:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.tasks.ide:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.team_feature:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn.wikitext_feature:1.7.0.I20120605-2216"/>
+		<item value="org.eclipse.mylyn_feature:3.8.0.I20120605-2216"/>
+		<item value="org.eclipse.pde:3.8.0.v20120525-1249-7c7vFitFFt6Zr5_yF0M3KRI"/>
+		<item value="org.eclipse.platform:4.2.0.v20120528-1648-9JF7BHV8FyMteji0MoOeOuU6sAnxIeYtKNM1dK"/>
+		<item value="org.eclipse.rcp:4.2.0.v20120528-1648-7IAPA7BrHQicRoQXOz0Obz-blRCA"/>
+		<item value="org.eclipse.rse.core:3.4.0.201205300905-7a7NFm-7sResSX4RTNSW"/>
+		<item value="org.eclipse.rse.dstore:3.4.0.201205300905-7L79FYw7VFNVFscFGMFs"/>
+		<item value="org.eclipse.rse.ftp:3.1.0.201205300905-782FBV8377A6FC79ODI4"/>
+		<item value="org.eclipse.rse.local:2.1.400.201205300905-7B4FSg7J9EJ9YO99r9Y"/>
+		<item value="org.eclipse.rse.ssh:3.0.400.201205300905-7A4FEc7F7BF7RJ77g7R"/>
+		<item value="org.eclipse.rse.telnet:2.3.0.201205300905-775FD3879AE8MH9BZFP4"/>
+		<item value="org.eclipse.rse.terminals:1.2.0.201205300905-773Eo7H89G8OJ8Db8NB27"/>
+		<item value="org.eclipse.rse.useractions:1.1.400.201205300905-31FBV773573D933L3D"/>
+		<item value="org.eclipse.rse:3.4.0.201205300905-7L7IFBV83omxZWwIDyHWipb2Sz-f"/>
+		<item value="org.eclipse.tm.terminal.ssh:2.1.100.201205300905-308Z312316411A16"/>
+		<item value="org.eclipse.tm.terminal.telnet:2.1.100.201205300905-308Z312316411A16"/>
+		<item value="org.eclipse.tm.terminal.view:2.3.0.201205300905-32-312316411A16"/>
+		<item value="org.eclipse.tm.terminal:3.2.0.201205300905-41-312316411A16"/>
+		<item value="org.eclipse.wst.common.fproj:3.4.0.v201202292300-377F8N8s735555393B7B"/>
+		<item value="org.eclipse.wst.jsdt.feature:1.4.0.v201111090639-7H7DFeHFC7sRemSZgYbe4"/>
+		<item value="org.eclipse.wst.web_ui.feature:3.4.0.v201203141800-7O7MFsGEMkBJz0rWbgfTLwn-4WKIocbP_pkka3Il"/>
+		<item value="org.eclipse.wst.xml.xpath2.processor.feature:2.0.100.v201203131922-7A7K0CcNBGPCTJ_FUOb"/>
+		<item value="org.eclipse.wst.xml_ui.feature:3.4.0.v201111021744-7H7GFeBDxumUpsl5liePhK3loz-m62J4rSz011R1"/>
+		<item value="org.eclipse.wst.xsl.feature:1.3.100.v201111021744-7T7ZFUaFIqUoJuvaKoCpQDKaGVPc"/>
+	</list>
+	<section name="ChooseWorkspaceDialogSettings">
+		<item value="197" key="DIALOG_Y_ORIGIN"/>
+		<item value="202" key="DIALOG_X_ORIGIN"/>
+	</section>
+	<section name="FlashExplorer">
+		<item value="" key="FlashExplorer.STORE_WORKING_SET"/>
+		<item value="1" key="FlashExplorer.STORE_SORT_TYPE"/>
+	</section>
+	<section name="WORKBENCH_SETTINGS">
+		<list key="ENABLED_TRANSFERS">
+		</list>
+	</section>
+</section>
