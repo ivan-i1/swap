@@ -31,7 +31,7 @@ export class LevelScene extends Phaser.Scene {
   create(): void {
     this.cameras.main.setBackgroundColor(bgColor);
 
-    const colliders: Phaser.Tilemaps.TilemapLayer[] = [];
+    const colliders: (Phaser.Tilemaps.TilemapLayer | Phaser.Tilemaps.TilemapGPULayer)[] = [];
     for (const def of layers) {
       const map = this.make.tilemap({ data: parseFlixelCsv(def.csv), tileWidth: TILE_SIZE, tileHeight: TILE_SIZE });
       const tileset = map.addTilesetImage(def.tileset, def.tileset, TILE_SIZE, TILE_SIZE, 0, 0, 0)!;

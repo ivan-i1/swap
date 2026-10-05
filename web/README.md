@@ -1,4 +1,4 @@
-# Swap — Phaser 3 port
+# Swap — Phaser 4 port
 
 Browser port of the 2013 Flixel/ActionScript prototype in `../src/org/dinosaurriders/swap`.
 Assets are imported in place from `../assets` and `../src/org/flixel/data`, so the AS3 project stays untouched.
