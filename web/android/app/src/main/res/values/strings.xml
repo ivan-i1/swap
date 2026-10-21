@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Swap</string>
+    <string name="title_activity_main">Swap</string>
+    <string name="package_name">org.dinosaurriders.swap</string>
+    <string name="custom_url_scheme">org.dinosaurriders.swap</string>
+</resources>
