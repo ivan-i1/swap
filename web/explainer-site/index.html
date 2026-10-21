@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swap — Phaser 4 port explainer</title>
+<style>
+  :root {
+    --paper: #fbf8f1; --ink: #1d1b16; --muted: #5b564b; --rule: #d9d2c2; --card: #fffdf8;
+    --code-bg: #f3eee2; --accent: #4b2a86;
+    --current: #1f6b3a; --current-bg: #e3f1e6;
+    --verify: #8a5a00; --verify-bg: #fbefd5;
+    --deferred: #4a4a4a; --deferred-bg: #e8e6e1;
+    --out: #8b2d2d; --out-bg: #f6e2e0;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+    font: 18px/1.6 ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 96px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 1.5rem; margin: 56px 0 12px; padding-top: 16px; border-top: 2px solid var(--rule); }
+  h3 { font-size: 1.15rem; margin: 32px 0 8px; }
+  h2, h3 { scroll-margin-top: 16px; }
+  section { scroll-margin-top: 16px; }
+  p, li { max-width: 72ch; }
+  a { color: var(--accent); }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.86em; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  pre { background: var(--code-bg); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px;
+    white-space: pre-wrap; overflow-wrap: anywhere; margin: 8px 0 16px; line-height: 1.45; }
+  pre code { background: none; padding: 0; }
+  .banner { border: 1px solid var(--rule); background: var(--card); border-radius: 8px; padding: 16px 18px; margin: 16px 0; }
+  .banner p { margin: 6px 0; }
+  .boundary { font-size: 1.1rem; border-left: 4px solid var(--accent); padding: 8px 14px; background: var(--card); margin: 16px 0; }
+  .chip { display: inline-block; font: 600 0.72rem/1.6 ui-monospace, Menlo, monospace; text-transform: uppercase;
+    letter-spacing: 0.04em; padding: 0 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; vertical-align: 2px; }
+  .chip.current { color: var(--current); background: var(--current-bg); }
+  .chip.verify { color: var(--verify); background: var(--verify-bg); }
+  .chip.deferred { color: var(--deferred); background: var(--deferred-bg); }
+  .chip.out { color: var(--out); background: var(--out-bg); }
+  .label { display: block; font: 600 0.8rem/1.4 ui-monospace, Menlo, monospace; color: var(--muted); margin-top: 12px; }
+  nav.toc { border: 1px solid var(--rule); background: var(--card); border-radius: 8px; padding: 12px 18px; }
+  nav.toc ol { margin: 8px 0; padding-left: 1.4em; columns: 2; column-gap: 32px; }
+  nav.toc li { break-inside: avoid; margin: 4px 0; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+  .card h4 { margin: 0 0 6px; font-size: 1rem; }
+  .card p, .card ul { margin: 4px 0; font-size: 0.95rem; }
+  .card ul { padding-left: 1.1em; }
+  .arrow { text-align: center; color: var(--muted); }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 20px; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--rule); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--code-bg); }
+  td { background: var(--card); overflow-wrap: anywhere; }
+  .table-wrap { overflow-x: auto; }
+  ol.trace { list-style: none; padding: 0; margin: 12px 0 24px; counter-reset: step; }
+  ol.trace > li { counter-increment: step; position: relative; background: var(--card); border: 1px solid var(--rule);
+    border-radius: 8px; padding: 12px 14px 12px 58px; margin: 10px 0; max-width: none; }
+  ol.trace > li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 30px; height: 30px;
+    border-radius: 50%; background: var(--accent); color: #fff; font: 700 0.9rem/30px ui-monospace, Menlo, monospace; text-align: center; }
+  .row { display: grid; grid-template-columns: 7em 1fr; gap: 2px 12px; }
+  .row > b { color: var(--muted); font: 600 0.78rem/1.9 ui-monospace, Menlo, monospace; text-transform: uppercase; }
+  .row > div { min-width: 0; }
+  .row pre { margin: 4px 0 0; }
+  .note { color: var(--muted); font-size: 0.92rem; }
+  .backtop { position: fixed; right: 16px; bottom: 16px; background: var(--card); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 6px 14px; font-size: 0.9rem; text-decoration: none; }
+  @media (max-width: 760px) {
+    body { font-size: 17px; }
+    nav.toc ol { columns: 1; }
+    .grid4, .grid3 { grid-template-columns: 1fr; }
+    .row { grid-template-columns: 1fr; }
+    ol.trace > li { padding-left: 14px; padding-top: 50px; }
+    /* Tables become one card per row, each cell labelled with its column. */
+    table, tbody, tr, td { display: block; }
+    thead { display: none; }
+    table { border: 0; }
+    tr { border: 1px solid var(--rule); border-radius: 8px; background: var(--card); margin: 0 0 12px; padding: 4px 0; }
+    td { border: 0; padding: 4px 12px; overflow-wrap: break-word; }
+    td::before { content: attr(data-label); display: block; color: var(--muted);
+      font: 600 0.72rem/1.6 ui-monospace, Menlo, monospace; text-transform: uppercase; }
+    .backtop { display: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header id="top">
+  <h1>Swap — how the Phaser 4 port works</h1>
+  <div class="banner">
+    <p><strong>What this page is.</strong> An orientation layer for an engineer who has not read the code. It
+      explains how the 2013 Flixel + Box2D game in this repository runs on Phaser 4 in a browser and as an
+      Android/iOS app. The code, <a href="../README.md">web/README.md</a> and <a href="../MOBILE.md">web/MOBILE.md</a>
+      stay authoritative. Where this page and the code disagree, the code wins.</p>
+    <p><strong>Checked against</strong> commit <code>b71c719</code> on <code>master</code> (2026-10-21). This
+      repo has no separate spec, schemas or ADRs. Every claim here comes from the source, from the README files, or
+      from running the parser and test suite. <strong>This page does not mean anything is deployed.</strong>
+      Nothing is published to a store yet.</p>
+    <p><strong>Status labels</strong> are given as text as well as colour:
+      <span class="chip current">Current</span> in the code on <code>master</code> ·
+      <span class="chip verify">Verify</span> built, but not yet checked by hand ·
+      <span class="chip deferred">Deferred</span> still owed by a person (keys, accounts, store listing) ·
+      <span class="chip out">Out of scope</span> deliberately not ported.</p>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Page index">
+  <strong>Index</strong>
+  <ol>
+    <li><a href="#overview">Overview and boundary</a> <span class="chip current">Current</span></li>
+    <li><a href="#stack">Stack and ownership</a> <span class="chip current">Current</span></li>
+    <li><a href="#walkthrough">Walkthrough: one swap in Level 3</a> <span class="chip current">Current</span></li>
+    <li><a href="#death">Contrast: dying and restarting</a> <span class="chip current">Current</span></li>
+    <li><a href="#frame">The core mechanism: one frame</a> <span class="chip current">Current</span></li>
+    <li><a href="#data">Data anatomy: a level, file to objects</a> <span class="chip current">Current</span></li>
+    <li><a href="#app">The app shell: touch, Android, iOS</a> <span class="chip verify">Verify</span></li>
+    <li><a href="#release">Store release: still owed</a> <span class="chip deferred">Deferred</span></li>
+    <li><a href="#differences">Deliberate differences and kept quirks</a> <span class="chip out">Out of scope</span></li>
+    <li><a href="#testing">Tests and how the rest was checked</a> <span class="chip current">Current</span></li>
+    <li><a href="#detail">Further detail: where to read next</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<section id="overview" aria-labelledby="h-overview">
+<h2 id="h-overview">1. Overview and boundary <span class="chip current">Current</span></h2>
+
+<p class="boundary"><strong>The original ActionScript level files and assets → the port in <code>web/</code> → the same
+  game, frame for frame, in a browser or an app WebView.</strong><br>
+  The port does not redesign the game, does not edit the ActionScript project, and makes no network requests.</p>
+
+<div class="grid4">
+  <div class="card"><h4>Does</h4><p>Re-runs the 2013 beta (title, levels 1–20 with no level 13, end screen) with
+    Flixel's player movement and Box2D's world physics, in the original update order.</p></div>
+  <div class="card"><h4>Does not</h4><p>Change level design, controls, tuning or quirks. Use Phaser's own physics.
+    Hold any game state on a server.</p></div>
+  <div class="card"><h4>Reads (read-only)</h4><p><code>src/org/dinosaurriders/swap/levels/*.as</code>,
+    <code>assets/</code> (CSV maps, PNGs, MP3s) and the Flixel font and button image, all in place in the AS3 tree.</p></div>
+  <div class="card"><h4>Produces</h4><p>A static bundle in <code>web/dist/</code> served as-is to browsers. Capacitor
+    copies the same bundle into <code>web/android/</code> and <code>web/ios/</code>.</p></div>
+</div>
+
+<p>The one idea to carry through the rest of the page: <strong>the player is a Flixel object and everything else is
+  a Box2D body.</strong> The player moves with Flixel's arcade movement and tile/box collision, and drags a Box2D body
+  along so other bodies can feel it. Rocks, switches, fields and exits are simulated by Box2D (here planck.js). The
+  original split responsibilities this way, and the port keeps that split rather than unifying it.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="stack" aria-labelledby="h-stack">
+<h2 id="h-stack">2. Stack and ownership <span class="chip current">Current</span></h2>
+
+<p>One job per component, and the thing each must not turn into. The "AS3 original" column is the file each one
+  replaces, which is the fastest way to check a behaviour question against the source.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Component</th><th>AS3 original</th><th>Does</th><th>Must not become</th></tr></thead>
+  <tbody>
+    <tr><td data-label="Component"><code>../src</code>, <code>../assets</code></td><td data-label="AS3 original">the whole Flash project</td>
+      <td data-label="Does">Source of truth for levels, maps, art, sound</td><td data-label="Must not become">Edited to suit the port. The port adapts to it.</td></tr>
+    <tr><td data-label="Component"><a href="../src/levels/parseLevel.ts"><code>levels/parseLevel.ts</code></a></td><td data-label="AS3 original">DAME exporter output, <code>BaseLevel.as</code></td>
+      <td data-label="Does">Turns each <code>Level_LevelN.as</code> file's text into a typed <code>LevelDef</code> at load time</td>
+      <td data-label="Must not become">A second level format. There is no converted copy of the levels anywhere.</td></tr>
+    <tr><td data-label="Component"><a href="../src/flixel/core.ts"><code>flixel/core.ts</code></a>, <a href="../src/flixel/control.ts"><code>control.ts</code></a></td>
+      <td data-label="AS3 original">Flixel 2.5 <code>FlxObject</code>, <code>FlxTilemap</code>, photonstorm <code>FlxControl</code></td>
+      <td data-label="Does">Player motion, <code>separate</code>, tile collision, walk/jump tuning</td><td data-label="Must not become">Phaser Arcade Physics, which has different maths</td></tr>
+    <tr><td data-label="Component">planck.js + <a href="../src/physics/as3shapes.ts"><code>physics/</code></a></td><td data-label="AS3 original">Box2D AS3 2.1a, <code>b2BuoyancyController</code></td>
+      <td data-label="Does">Rigid bodies, contacts, buoyancy; AS3 mass rules where planck differs</td><td data-label="Must not become">Driven by Phaser's variable frame delta</td></tr>
+    <tr><td data-label="Component"><a href="../src/game/LevelContainer.ts"><code>game/LevelContainer.ts</code></a></td><td data-label="AS3 original"><code>LevelContainer.as</code> + <code>FlxG</code></td>
+      <td data-label="Does">Builds a level, then runs exactly one Flixel frame per <code>tick()</code></td><td data-label="Must not become">Aware of Phaser timing. It only ever sees fixed 1/60 s steps.</td></tr>
+    <tr><td data-label="Component"><a href="../src/game/objects/"><code>game/objects/</code></a></td><td data-label="AS3 original"><code>objects/*.as</code></td>
+      <td data-label="Does"><code>Player</code>, <code>PolygonBody</code>, <code>WeightSwitch</code>, <code>BreakableWall</code>, <code>Exit</code>, <code>PropertyField</code>, text hints, effects</td>
+      <td data-label="Must not become">Phaser game objects with their own update loops. Each owns a <code>view</code> it pushes state into on render.</td></tr>
+    <tr><td data-label="Component"><a href="../src/game/physicsUtil.ts"><code>game/physicsUtil.ts</code></a></td><td data-label="AS3 original"><code>PhysicsUtil.as</code> (static)</td>
+      <td data-label="Does">Queues body destruction, rotations, swaps and hint text around the world step; one per level</td><td data-label="Must not become">Global state shared between levels</td></tr>
+    <tr><td data-label="Component">Phaser 4.2.1 + <a href="../src/scenes/"><code>scenes/</code></a></td><td data-label="AS3 original"><code>FlxGame</code>, <code>Inicio.as</code>, <code>EndgameState.as</code></td>
+      <td data-label="Does">Loading, drawing (tilemaps, sprites, glow/blur filters), audio, scene switching, the 60 Hz accumulator</td>
+      <td data-label="Must not become">The owner of game physics or game time</td></tr>
+    <tr><td data-label="Component"><a href="../src/input/keyLatch.ts"><code>input/keyLatch.ts</code></a></td><td data-label="AS3 original"><code>FlxG.keys</code></td>
+      <td data-label="Does">Merges keyboard and touch buttons into pressed / justPressed / justReleased, sampled once per tick</td>
+      <td data-label="Must not become">Per-scene input. It is one latch, registered once on the window.</td></tr>
+    <tr><td data-label="Component">Capacitor 8 (<code>android/</code>, <code>ios/</code>, <a href="../src/native.ts"><code>native.ts</code></a>)</td><td data-label="AS3 original">none (Flash had no app)</td>
+      <td data-label="Does">Native shell around the WebView, Android back button, release-on-pause, icons, landscape lock</td>
+      <td data-label="Must not become">A second codebase. No game logic lives in Kotlin/Swift.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="note">Units: Box2D works in metres and the game in pixels, at <code>Settings.ratio = 50</code> px per metre
+  (<a href="../src/game/settings.ts">settings.ts</a>). A tile is 32 px (0.64 m). Default gravity is 10 m/s², which
+  the player's Flixel acceleration sees as 500 px/s².</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="walkthrough" aria-labelledby="h-walk">
+<h2 id="h-walk">3. Walkthrough: one swap in Level 3 <span class="chip current">Current</span></h2>
+
+<p>Level 3 is the level that teaches the swap. This traces it from the level file to loading Level 4, using
+  the level's real contents. <strong>Provenance:</strong> entity values are copied from
+  <a href="../../src/org/dinosaurriders/swap/levels/Level_Level3.as"><code>Level_Level3.as</code></a> and from
+  running <code>parseLevel</code> on it. Code behaviour is cited by file. Masses were computed with the port's own
+  formulas (<code>as3MassData</code>, density × area).</p>
+
+<div class="card">
+  <h4>The cast in Level 3</h4>
+  <ul>
+    <li><strong>Player</strong> starts at (0, 288).</li>
+    <li><strong>Rock</strong>: a <code>PolygonBody</code> (<code>SquareRock2</code>, 32×32 px, 4 sides, density 2500) at (240, 384), <code>swappable: true</code>.</li>
+    <li><strong>Weight switch</strong> #4 at (450, 408), required force 100.</li>
+    <li><strong>Exit</strong> #5 at (600, 256), <code>enabled: false</code>, <code>warp: "Level4"</code>.</li>
+    <li><strong>Links:</strong> switch #4 → exit #5 <code>onActivate: "ENABLE"</code>. Box #27 → hint #28 and box #29 → hint #30 <code>showText</code>.</li>
+  </ul>
+</div>
+
+<ol class="trace">
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/game/assets.ts"><code>game/assets.ts</code></a> (Vite at build time)</div>
+    <b>Action</b><div><code>import.meta.glob(…/Level_Level*.as, {query: '?raw'})</code> bundles every level file's text,
+      keyed by name.</div>
+    <b>Data</b><div><code>LEVEL_SOURCES["Level3"]</code> = the whole AS3 class as a string, unchanged.</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/scenes/TitleScene.ts"><code>TitleScene</code></a> → <a href="../src/scenes/LevelScene.ts"><code>LevelScene</code></a></div>
+    <b>Action</b><div>The level starts with <code>scene.start('Level', {level})</code>: from the title for Level 1, or
+      by restart from the previous level's exit. <code>create()</code> builds a <code>LevelContainer</code> and shows the
+      touch buttons on touch devices.</div>
+    <b>Data</b><div><code>new LevelContainer(scene, keys, "Level3")</code></div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/levels/parseLevel.ts"><code>parseLevel</code></a></div>
+    <b>Action</b><div>Matches the exporter's fixed one-statement-per-line patterns: <code>addTilemap</code>,
+      <code>TextData</code>, <code>BoxData</code>, <code>addSpriteToLayer</code>, <code>createLink</code>.</div>
+    <b>Data</b><div><span class="label">Real parser output, excerpt (two of nine entities, one of three links)</span>
+<pre><code>[
+  { "kind": "sprite", "type": "PolygonBody",
+    "ctorArgs": [240, 384, "Assets.SquareRock2", 4, 2500],
+    "x": 240, "y": 384, "props": [{ "name": "swappable", "value": true }] },
+  { "kind": "sprite", "id": 5, "type": "Exit", "ctorArgs": [600, 256, "Assets.Exit"],
+    "props": [{ "name": "sensor", "value": true }, { "name": "enabled", "value": false },
+              { "name": "warp", "value": "Level4" }] },
+  { "from": 4, "to": 5, "props": [{ "name": "onActivate", "value": "ENABLE" }] }
+]</code></pre>
+    <p class="note">Shown as one array for reading. In the real <code>LevelDef</code> the first two are in
+      <code>entities</code> and the third in <code>links</code>, and the fields left out here are present.</p></div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/game/LevelContainer.ts"><code>LevelContainer</code></a> constructor</div>
+    <b>Action</b><div>Draws the 4 tile layers (Sky, Background, PlayerLayer, FrontLayer). The one layer with
+      <code>hits: true</code> (PlayerLayer) becomes the Flixel hit map plus <strong>one static Box2D box per solid
+      tile</strong>, solid columns past both edges, and a <code>kills</code> row 5 tiles below the map. Each sprite
+      entity becomes its class. Each box becomes an invisible <code>PropertyField</code>.</div>
+    <b>Data</b><div>The rock's <code>swappable</code> setter adds a purple inner glow (<code>0x6600cc</code>).
+      The exit's <code>enabled = false</code> hides it and calls <code>body.setActive(false)</code>. Link
+      4→5 is stored on the switch as <code>["onActivate", "ENABLE", exit]</code>.</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><code>LevelScene.update</code></div>
+    <b>Action</b><div>Each animation frame adds Phaser's <code>delta</code> to an accumulator (capped at
+      2000/30 − 1 ≈ 65.7 ms, as <code>FlxGame</code> caps it). It runs <code>keys.sample()</code> + <code>tick()</code>
+      once for every whole 16.67 ms, then <code>render()</code> once.</div>
+    <b>Data</b><div>Game time advances only in fixed <code>ELAPSED = 1/60</code> s steps.</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/game/objects/PropertyField.ts"><code>PropertyField</code></a> #27</div>
+    <b>Action</b><div>The player walks right into box #27 (0, 120, 50×200). Box2D reports
+      <code>begin-contact</code>. The field's link action runs and <code>PhysicsUtil.enqueueText</code> shows hint #28,
+      replacing any hint already showing.</div>
+    <b>Data</b><div>On screen for <code>TEXTDURATION</code> = 4 s: "The S.W.A.P. spell lets me select glowing objects with the [S] key"</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/input/keyLatch.ts"><code>KeyLatch</code></a> → <a href="../src/game/objects/Player.ts"><code>Player.update</code></a></div>
+    <b>Action</b><div><strong>S</strong> goes down (keyboard or the SELECT button). On the next sample
+      <code>justPressed('S')</code> is true. The player adds fixture&nbsp;[3], a 1 × 1 m box sensor, plus the visible
+      swap-area sprite.</div>
+    <b>Data</b><div><code>fixtures[3] = Box(0.5, 0.5), isSensor: true</code>. It is removed on <code>justReleased('S')</code>.</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><code>Player.onStartCollision</code></div>
+    <b>Action</b><div>The sensor overlaps the rock. The fixture is [3] and the other body is swappable, so the rock
+      becomes the swap target and is marked selected. Any previously selected body is deselected.</div>
+    <b>Data</b><div><code>tempSwapObject = rock</code>; <code>rock.selected = true</code> → glow turns green (<code>0x66ff33</code>).</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><code>Player.update</code> → <a href="../src/game/physicsUtil.ts"><code>PhysicsUtil</code></a></div>
+    <b>Action</b><div><strong>X</strong> pressed (<code>justPressed('X')</code>) with a target set: the swap is
+      <em>queued</em>, not performed. Order matters: target first, player second, so the player's
+      <code>swap()</code> is the one called.</div>
+    <b>Data</b><div><code>swapQueue = [rock, player]</code>, <code>currentSkipCount = 0</code></div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><code>PhysicsUtil.callSwaps</code>, pass 1 (before the step)</div>
+    <b>Action</b><div>The skip count goes to 1 and both bodies are disabled for this step: invisible, with
+      <code>body.setActive(false)</code>. The world is not locked here, so <code>physicsOp</code> runs immediately.</div>
+    <b>Data</b><div>Neither body collides during this frame's <code>world.step(1/60, 10, 10)</code>.</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><code>PhysicsUtil.callSwaps</code>, pass 2 (after the step) → <code>Player.swap</code></div>
+    <b>Action</b><div>The skip count reaches <code>SWAPSKIPCOUNT = 2</code>. Both bodies are re-enabled, then the
+      player calls <code>swap(rock)</code>: positions exchange, velocities exchange, a <code>SwapTrail</code> is drawn
+      at both spots, and a 1 s cooldown starts (<code>SWAPCOOLDOWN</code>, a <code>FlxTimer</code>).</div>
+    <b>Data</b><div>Player at the rock's old centre, rock at the player's. The velocity copy keeps the original's
+      unit mix (m/s into px/s), so a resting rock hands the player near-zero speed. All of this happens
+      <strong>within one tick</strong>: the swap is visible in the very next render.</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/game/objects/bodies.ts"><code>WeightSwitch</code></a> #4</div>
+    <b>Action</b><div>Every body contact adds <code>mass × |gravity|</code> and every contact end subtracts it. At or
+      above 100 the switch activates, and the <code>onActivate: ENABLE</code> link sets <code>exit.enabled = true</code>
+      (visible, body active). Below 100 it disables the exit again.</div>
+    <b>Data</b><div>Computed with the port's formulas: player 71.5 kg × 10 = 715, rock 1024 kg × 10 = 10 240.
+      Either one clears 100 alone.</div>
+  </div></li>
+
+  <li><div class="row">
+    <b>Owner</b><div><code>Exit</code> #5 → <code>LevelContainer</code> → <code>LevelScene</code></div>
+    <b>Action</b><div>A player contact with the active exit sensor calls <code>exitLevel("Level4")</code>. At the end of
+      the tick the container records its outcome, the scene stops ticking, and the level restarts with the next
+      name.</div>
+    <b>Data</b><div><span class="label">TypeScript value, from <code>LevelContainer.ts</code> (not a wire format)</span>
+<pre><code>outcome = { kind: 'restart', level: 'Level4' }  →  scene.restart({ level: 'Level4' })</code></pre></div>
+  </div></li>
+</ol>
+</section>
+
+<!-- ============================================================ -->
+<section id="death" aria-labelledby="h-death">
+<h2 id="h-death">4. Contrast: dying and restarting <span class="chip current">Current</span></h2>
+
+<p>The boundary case. There is no lives counter and no game-over screen. Every death, and the <strong>R</strong> key,
+  produces the same outcome: rebuild the current level from its file.</p>
+
+<ol class="trace">
+  <li><div class="row">
+    <b>Owner</b><div>Box2D contact → <code>Player</code></div>
+    <b>Action</b><div>Three ways an attempt ends:
+      <ul>
+        <li>touching any body with <code>kills: true</code>, such as tiles 14/15 or the kill row under the map;</li>
+        <li>being crushed: after the solve, if <code>normalImpulse × 60 &gt; MAXFORCE</code> (10 000);</li>
+        <li>pressing R, which <code>tick()</code> checks directly without killing the player.</li>
+      </ul></div>
+    <b>Data</b><div>Deaths: <code>player.kill()</code> → <code>onKill</code> callback → <code>reset()</code>. R: <code>reset()</code>.</div>
+  </div></li>
+  <li><div class="row">
+    <b>Owner</b><div><code>LevelContainer.reset</code></div>
+    <b>Action</b><div>Records the outcome once (<code>??=</code>), so a second death in the same tick changes nothing.</div>
+    <b>Data</b><div><code>{ kind: 'restart', level: 'Level3' }</code></div>
+  </div></li>
+  <li><div class="row">
+    <b>Owner</b><div><code>LevelScene</code></div>
+    <b>Action</b><div><code>scene.restart</code> throws away the whole container: planck world, timers,
+      <code>PhysicsUtil</code>, sprites. The key latch is window-level rather than per scene, so a key held on the
+      keyboard is still held in the rebuilt level.</div>
+    <b>Data</b><div>Nothing carries over between attempts except the key latch.</div>
+  </div></li>
+</ol>
+<p class="note">The last level has a <code>PropertyField</code> with <code>endgame: true</code>. Entering it sets the
+  outcome to <code>{ kind: 'endgame' }</code>, which shows "Thank you for playing" and returns to the title after 5 s.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="frame" aria-labelledby="h-frame">
+<h2 id="h-frame">5. The core mechanism: one frame <span class="chip current">Current</span></h2>
+
+<p>The reason the port plays like the original is that <code>LevelContainer.tick()</code> repeats Flixel's frame
+  order exactly. Reordering any of these steps changes gameplay (jump feel, swap timing, crush deaths). Read the
+  method itself before moving anything.</p>
+
+<ol>
+  <li><strong>Clock</strong> += 16.67 ms. <strong>Plugins</strong>: <code>TimerManager.update</code>, then the player's
+    <code>FlxControl</code> (walk acceleration 500, top speed 150 px/s, drag 800, jump 265 px/s, 200 ms coyote time).</li>
+  <li><strong>Members</strong> in insertion order: <code>preUpdate</code> → <code>update</code> → <code>postUpdate</code>.
+    Box2D bodies copy their position from the world and add their own gravity force. The player instead pushes its
+    Flixel position <em>into</em> its Box2D body.</li>
+  <li><strong><code>FlxG.collide(player, spriteGroup)</code></strong>: Flixel separation of the player against solid
+    sprites and the hit tilemap.</li>
+  <li><strong><code>PhysicsUtil.update</code></strong>: swap pass 1, destroy queued bodies, apply queued rotations,
+    buoyancy.</li>
+  <li><strong>Buoyancy again</strong>, then <strong><code>world.step(1/60, 10, 10)</code></strong>. The AS3 world ran
+    its controllers inside <code>Step()</code>, so buoyancy is applied twice per frame in the original too.</li>
+  <li><strong>Deferred physics ops</strong>: mutations requested inside contact callbacks run now. planck forbids them
+    mid-step; AS3 Box2D allowed them. Same frame, same order.</li>
+  <li><strong>Swap pass 2</strong>, then <strong>R / exit / death</strong> outcome checks, then the
+    <strong>camera</strong> (platformer deadzone, clamped to the map) and the screen-flash fade.</li>
+</ol>
+
+<div class="grid3">
+  <div class="card"><h4>Flixel side (player)</h4><p>Arcade velocity, drag and max speed; axis-separated AABB
+    collision with an overlap bias of 4 px. Pure functions in <code>flixel/core.ts</code>, unit-tested.</p></div>
+  <div class="card"><h4>Box2D side (world)</h4><p>Everything else. Contacts are routed to each body's
+    <code>onStart/onEnd/onBefore/onAfterSolveCollision</code> through the fixture's <code>userData</code>.</p></div>
+  <div class="card"><h4>Where they meet</h4><p>The player's Box2D body carries the <strong>AS3 mass</strong> (71.5 kg).
+    AS3 counted the clockwise foot sensor as negative area. planck would re-wind it and get a different mass, which
+    would change pushing, switches and crushes, so the mass is set explicitly.</p></div>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="data" aria-labelledby="h-data">
+<h2 id="h-data">6. Data anatomy: a level, file to objects <span class="chip current">Current</span></h2>
+
+<p>There is no network API and no wire contract in this project. The only "contract" is the TypeScript
+  <code>LevelDef</code> interface in <a href="../src/levels/parseLevel.ts"><code>parseLevel.ts</code></a>, enforced by
+  the compiler and by a test that parses every shipped level.</p>
+
+<div class="grid3">
+  <div class="card">
+    <h4>1 · Source (read-only)</h4>
+    <span class="label">Real source line, Level_Level3.as:112, trimmed</span>
+<pre><code>linkedObjectDictionary[5] = addSpriteToLayer(
+  new Exit(600.000, 256.000, Assets.Exit), Exit,
+  SpritesGroup, 600.000, 256.000, 0.000, …,
+  generateProperties({name:"sensor", value:true},
+    {name:"enabled", value:false},
+    {name:"warp", value:"Level4"}, null), …);</code></pre>
+  </div>
+  <div class="card">
+    <h4>2 · Parsed (in memory)</h4>
+    <span class="label">Real parser output, excerpt</span>
+<pre><code>{ "kind": "sprite", "id": 5, "type": "Exit",
+  "ctorArgs": [600, 256, "Assets.Exit"],
+  "group": "SpritesGroup",
+  "props": [
+    { "name": "sensor", "value": true },
+    { "name": "enabled", "value": false },
+    { "name": "warp", "value": "Level4" } ] }</code></pre>
+    <p class="note">Omitted: position, angle, scroll, flip and scale fields.</p>
+  </div>
+  <div class="card">
+    <h4>3 · Running (objects)</h4>
+    <ul>
+      <li><code>new Exit(rt, 600, 256)</code>; the sprite is drawn 10 px lower</li>
+      <li>static Box2D body, sensor fixture</li>
+      <li><code>warpTo = "Level4"</code></li>
+      <li><code>enabled = false</code>: hidden, body inactive</li>
+      <li>placed in the <code>SpritesGroup</code> draw layer</li>
+    </ul>
+  </div>
+</div>
+
+<h3>What a level file can say</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Where</th><th>Property</th><th>Effect in the port</th></tr></thead>
+  <tbody>
+    <tr><td data-label="Where">any body</td><td data-label="Property"><code>swappable</code>, <code>sensor</code>, <code>kills</code>, <code>enabled</code>,
+      <code>friction</code>, <code>fixedrotation</code>, <code>fixedx</code>, <code>affectsplayer</code>, <code>innerglow</code>, <code>outerglow</code></td>
+      <td data-label="Effect in the port"><code>PhysicalBody.createPhysicsObject</code>. <code>fixedx</code> adds a vertical prismatic rail.</td></tr>
+    <tr><td data-label="Where">box → <code>PropertyField</code></td><td data-label="Property"><code>gravityx</code>, <code>gravityy</code>, <code>buoyancy</code>,
+      <code>fixesRotation</code>, <code>blur</code>, <code>onlyPlayer</code>, <code>endgame</code></td>
+      <td data-label="Effect in the port">Applied when a body enters, removed when it leaves (counted per body)</td></tr>
+    <tr><td data-label="Where">tile</td><td data-label="Property"><code>kills</code></td><td data-label="Effect in the port">Set on that tile's static box (tiles 14/15 in Level 3)</td></tr>
+    <tr><td data-label="Where">link</td><td data-label="Property"><code>showText</code>, <code>onActivate: ENABLE</code>, <code>require: AND</code></td>
+      <td data-label="Effect in the port">Box → hint text. Switch → enables a target, optionally only while the other switches are active too.</td></tr>
+    <tr><td data-label="Where">exit</td><td data-label="Property"><code>warp</code></td><td data-label="Effect in the port">Name of the next level</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="app" aria-labelledby="h-app">
+<h2 id="h-app">7. The app shell: touch, Android, iOS <span class="chip verify">Verify</span></h2>
+
+<p>Capacitor copies <code>dist/</code> into a native project that shows it in the system WebView (Chromium on Android,
+  WKWebView on iOS). Phaser runs exactly as it does in a mobile browser, so <strong>nothing is translated between native
+  code and the game</strong>. The only native-aware file is <a href="../src/native.ts"><code>native.ts</code></a>, and it
+  does nothing in a browser.</p>
+
+<h3>Third scenario: one thumb on JUMP</h3>
+<ol class="trace">
+  <li><div class="row">
+    <b>Owner</b><div><a href="../src/input/touchControls.ts"><code>touchControls.ts</code></a></div>
+    <b>Action</b><div>A DOM button over the canvas (not a Phaser object) gets <code>pointerdown</code> and captures
+      the pointer, so sliding the finger off it does not drop the key.</div>
+    <b>Data</b><div><code>keys.down('SPACE', 'touch')</code></div>
+  </div></li>
+  <li><div class="row">
+    <b>Owner</b><div><code>KeyLatch</code></div>
+    <b>Action</b><div>A key is held while any source holds it. Keyboard Space plus the touch button count as one press,
+      and the key only goes "up" when the last source lets go.</div>
+    <b>Data</b><div>Next <code>sample()</code>: <code>justPressed('SPACE')</code> for exactly one tick, then <code>pressed</code></div>
+  </div></li>
+  <li><div class="row">
+    <b>Owner</b><div><code>FlxControl</code> (tick step 1)</div>
+    <b>Action</b><div>FlxControl reads <code>pressed('SPACE')</code>, whichever source holds it. The rule: on the
+      floor or within 200 ms of leaving it, at most one jump every 250 ms.</div>
+    <b>Data</b><div>Player velocity.y = −265 px/s, under normal downward gravity</div>
+  </div></li>
+</ol>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Piece</th><th>Status</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td data-label="Piece">Touch buttons: ◀ ▶ ↻ on the left, SELECT / SWAP / JUMP on the right</td><td data-label="Status"><span class="chip current">Current</span></td><td data-label="Notes">Shown on touch devices during levels only</td></tr>
+    <tr><td data-label="Piece">Android back: level/end → title; title → exit app. Pause → release all keys.</td><td data-label="Status"><span class="chip current">Current</span></td><td data-label="Notes"><code>native.ts</code></td></tr>
+    <tr><td data-label="Piece">Landscape lock, immersive full screen (Android), hidden status bar, safe areas</td><td data-label="Status"><span class="chip current">Current</span></td><td data-label="Notes">Manifest, <code>MainActivity</code>, Info.plist, <code>index.html</code> CSS</td></tr>
+    <tr><td data-label="Piece">Android debug APK and signed release AAB builds</td><td data-label="Status"><span class="chip current">Current</span></td><td data-label="Notes">Signing proven with a throwaway key, since deleted. Needs JDK 21.</td></tr>
+    <tr><td data-label="Piece">iOS project (Swift Package Manager)</td><td data-label="Status"><span class="chip current">Current</span></td><td data-label="Notes">Launches in landscape in the simulator</td></tr>
+    <tr><td data-label="Piece">iOS touch play, checked by hand</td><td data-label="Status"><span class="chip verify">Verify</span></td><td data-label="Notes">Only checked in Chrome's touch emulation. Not yet tapped through in the simulator or on a device.</td></tr>
+    <tr><td data-label="Piece">Icon and splash art</td><td data-label="Status"><span class="chip verify">Verify</span></td><td data-label="Notes">Placeholder built from the player sprite (<code>resources/</code>); replace and run <code>npm run mobile:assets</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">App id <code>org.dinosaurriders.swap</code> is permanent once uploaded to either store.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="release" aria-labelledby="h-release">
+<h2 id="h-release">8. Store release: still owed <span class="chip deferred">Deferred</span></h2>
+<p>These steps belong to a person with the accounts. The code is ready for them but cannot do them.
+  <a href="../MOBILE.md">MOBILE.md</a> has the commands.</p>
+<ul>
+  <li><span class="chip deferred">Deferred</span> Play upload key and <code>android/keystore.properties</code>, which
+    is gitignored. Without it, <code>npm run android:bundle</code> builds an unsigned AAB that Play rejects.</li>
+  <li><span class="chip deferred">Deferred</span> Apple Developer team selected in Xcode, an App Store Connect record,
+    and an archive and upload.</li>
+  <li><span class="chip deferred">Deferred</span> Store listing: screenshots, a 1024×500 feature graphic,
+    descriptions, a privacy policy URL, content ratings.</li>
+  <li><span class="chip deferred">Deferred</span> Confirmation that you hold the rights to the Dinosaur Riders art,
+    music and name.</li>
+</ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="differences" aria-labelledby="h-diff">
+<h2 id="h-diff">9. Deliberate differences and kept quirks <span class="chip out">Out of scope</span></h2>
+<p>From <a href="../README.md">web/README.md</a>. Do not "fix" the quirks without deciding to change the game.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Item</th><th>Kind</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td data-label="Item">Mid-step physics changes</td><td data-label="Kind">Difference</td><td data-label="Detail">Run right after the step (planck forbids them during it). Same frame, same order.</td></tr>
+    <tr><td data-label="Item">Player mass</td><td data-label="Kind">Difference</td><td data-label="Detail">Set explicitly to the AS3 value; see <a href="#frame">§5</a>.</td></tr>
+    <tr><td data-label="Item">Glow and blur</td><td data-label="Kind">Difference</td><td data-label="Detail">Phaser 4 filters stand in for Flash <code>GlowFilter</code>/<code>BlurFilter</code>. The blur trail is fading copies under one blur filter, not a re-blurred bitmap.</td></tr>
+    <tr><td data-label="Item"><code>StartAnimation.as</code> (SWF movie)</td><td data-label="Kind"><span class="chip out">Out of scope</span></td><td data-label="Detail">Not ported. The original never shows it either.</td></tr>
+    <tr><td data-label="Item">Footsteps stack every frame; music restarts each level</td><td data-label="Kind">Kept quirk</td><td data-label="Detail">As in the original</td></tr>
+    <tr><td data-label="Item"><code>onlyPlayer</code> fields also affect objects</td><td data-label="Kind">Kept quirk</td><td data-label="Detail"><code>affectsPlayer</code> defaults to true, which makes the check redundant</td></tr>
+    <tr><td data-label="Item">Swap copies velocity across units</td><td data-label="Kind">Kept quirk</td><td data-label="Detail">m/s into px/s and back; see <a href="#walkthrough">step 11</a></td></tr>
+    <tr><td data-label="Item">Text links create a second field</td><td data-label="Kind">Kept quirk</td><td data-label="Detail">The original's own FIXME; harmless</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="testing" aria-labelledby="h-test">
+<h2 id="h-test">10. Tests and how the rest was checked <span class="chip current">Current</span></h2>
+<p><strong>Re-run for this page:</strong> <code>npx vitest run</code> passed 66 of 66 tests in 7 files on
+  <code>b71c719</code>. These tests cover the logic that can be unit-tested. Rendering and the scenes were checked by
+  playing the game.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Test file</th><th>Pins down</th></tr></thead>
+  <tbody>
+    <tr><td data-label="Test file"><a href="../tests/flixel.test.ts">flixel.test.ts</a></td><td data-label="Pins down"><code>computeVelocity</code>, <code>updateMotion</code>, <code>separate</code> (incl. tilemaps), broad phase, <code>postUpdate</code>, FlxControl as configured by <code>Player.as</code></td></tr>
+    <tr><td data-label="Test file"><a href="../tests/physics.test.ts">physics.test.ts</a></td><td data-label="Pins down">Submerged area, AS3 signed-area mass, buoyancy controller</td></tr>
+    <tr><td data-label="Test file"><a href="../tests/physicsUtil.test.ts">physicsUtil.test.ts</a></td><td data-label="Pins down">The two-pass swap queue; the one-hint-at-a-time slot</td></tr>
+    <tr><td data-label="Test file"><a href="../tests/parseLevel.test.ts">parseLevel.test.ts</a></td><td data-label="Pins down">Exporter format, plus <strong>every shipped level</strong> parses</td></tr>
+    <tr><td data-label="Test file"><a href="../tests/camera.test.ts">camera.test.ts</a></td><td data-label="Pins down">Bounds clamp, platformer deadzone, follow</td></tr>
+    <tr><td data-label="Test file"><a href="../tests/keyLatch.test.ts">keyLatch.test.ts</a></td><td data-label="Pins down">Keyboard + touch merge, just-pressed/released edges, release-all</td></tr>
+    <tr><td data-label="Test file"><a href="../tests/tilemapCsv.test.ts">tilemapCsv.test.ts</a></td><td data-label="Pins down">Flixel CSV map parsing</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>Checked by hand while porting (2026-10), not re-run for this page:</strong> headless-Chrome play-through of
+  levels 1–20 and the end screen; swap, restart, fall death, weight switch, breakable wall and blur field checked
+  individually; touch emulation at phone and tablet sizes; Android emulator (tap Start, hold ▶, back button);
+  iOS simulator launch.</p>
+<pre><code>cd web
+npm install
+npm test           # 66 unit tests
+npm run dev        # http://localhost:5173
+npm run build      # type-check + dist/</code></pre>
+</section>
+
+<!-- ============================================================ -->
+<section id="detail" aria-labelledby="h-detail">
+<h2 id="h-detail">11. Further detail: where to read next</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Open</th><th>When you need</th></tr></thead>
+  <tbody>
+    <tr><td data-label="Open"><a href="../README.md">web/README.md</a></td><td data-label="When you need">Running it, the original-to-port file map, deliberate differences</td></tr>
+    <tr><td data-label="Open"><a href="../MOBILE.md">web/MOBILE.md</a></td><td data-label="When you need">Building the apps, signing, store submission steps</td></tr>
+    <tr><td data-label="Open"><a href="../src/game/LevelContainer.ts">src/game/LevelContainer.ts</a></td><td data-label="When you need">Level construction and the exact frame order (§5)</td></tr>
+    <tr><td data-label="Open"><a href="../src/game/objects/Player.ts">src/game/objects/Player.ts</a></td><td data-label="When you need">Selection, swap, death, the AS3 mass override</td></tr>
+    <tr><td data-label="Open"><a href="../src/game/physicsUtil.ts">src/game/physicsUtil.ts</a></td><td data-label="When you need">Why a swap takes two passes around the step</td></tr>
+    <tr><td data-label="Open"><a href="../src/levels/parseLevel.ts">src/levels/parseLevel.ts</a></td><td data-label="When you need">The <code>LevelDef</code> types and the exporter patterns</td></tr>
+    <tr><td data-label="Open"><a href="../../src/org/dinosaurriders/swap/levels/Level_Level3.as">Level_Level3.as</a></td><td data-label="When you need">The level traced in §3, as authored</td></tr>
+    <tr><td data-label="Open"><a href="../../src/org/dinosaurriders/swap/">src/org/dinosaurriders/swap/</a></td><td data-label="When you need">The ActionScript original, for any "what did it do before" question</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+</main>
+<a class="backtop" href="#top">↑ Index</a>
+</body>
+</html>
