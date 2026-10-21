@@ -1,19 +1,30 @@
 {
   "name": "swap-web",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "mobile:sync": "npm run build && cap sync",
+    "mobile:assets": "capacitor-assets generate --android --ios --assetPath resources --iconBackgroundColor '#1a0b33' --splashBackgroundColor '#000000' --splashBackgroundColorDark '#000000'",
+    "android:apk": "npm run mobile:sync && cd android && ./gradlew assembleDebug",
+    "android:bundle": "npm run mobile:sync && cd android && ./gradlew bundleRelease",
+    "ios:open": "npm run mobile:sync && cap open ios"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
     "phaser": "^4.2.1",
     "planck": "^1.5.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.3",
     "@types/node": "^26.6.4",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",

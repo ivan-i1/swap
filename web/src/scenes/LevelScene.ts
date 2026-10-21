@@ -2,8 +2,9 @@
 import Phaser from 'phaser';
 import { LevelContainer } from '../game/LevelContainer';
 import { ELAPSED } from '../game/settings';
+import { keys } from '../input/keyLatch';
+import { showTouchControls } from '../input/touchControls';
 import { playMusic } from './music';
-import { KeyTracker } from './keys';
 
 const STEP_MS = 1000 * ELAPSED;
 // FlxGame caps the catch-up at 2000 / flashFramerate - 1 ms (flash framerate 30).
@@ -11,7 +12,6 @@ const MAX_ACCUMULATION = 2000 / 30 - 1;
 
 export class LevelScene extends Phaser.Scene {
   private container!: LevelContainer;
-  private keys!: KeyTracker;
   private accumulator = 0;
   private levelName = 'Level1';
 
@@ -25,8 +25,9 @@ export class LevelScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.keys = new KeyTracker(this.input.keyboard!);
-    this.container = new LevelContainer(this, this.keys, this.levelName);
+    this.container = new LevelContainer(this, keys, this.levelName);
+    showTouchControls(true);
+    this.events.once('shutdown', () => showTouchControls(false));
     playMusic(this, 'dark');
     // Exposed for automated play-checks and debugging.
     (window as unknown as { swap: unknown }).swap = { level: this.levelName, container: this.container };
@@ -36,7 +37,7 @@ export class LevelScene extends Phaser.Scene {
     this.accumulator = Math.min(this.accumulator + delta, MAX_ACCUMULATION);
     while (this.accumulator >= STEP_MS) {
       this.accumulator -= STEP_MS;
-      this.keys.sample();
+      keys.sample();
       this.container.tick();
       const outcome = this.container.outcome;
       if (outcome) {

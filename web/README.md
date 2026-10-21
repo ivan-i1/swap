@@ -12,7 +12,9 @@ npm run build    # type-check + production build into dist/
 ```
 
 Controls: **← →** move, **Space** jump, hold **S** to select a glowing object, **X** to swap places with it,
-**R** to restart the level.
+**R** to restart the level. On phones and tablets the same keys are on-screen buttons.
+
+Android and iOS apps: see [MOBILE.md](MOBILE.md).
 
 ## How it is put together
 
